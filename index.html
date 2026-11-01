@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Moving Man Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app" id="app" data-tab="intro">
+
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="1" y="1" width="30" height="30" rx="9" class="bm-bg"/>
+        <path d="M6 23 C 11 23, 12 9, 17 9 S 23 17, 26 15" class="bm-line"/>
+        <circle cx="26" cy="15" r="2.6" class="bm-dot"/>
+      </svg>
+      <div class="brand-text">
+        <span class="brand-name">Moving Man</span>
+        <span class="brand-sub">Motion Lab</span>
+      </div>
+    </div>
+
+    <nav class="tabs" role="tablist" aria-label="Screens">
+      <button role="tab" class="tab" id="tab-intro" data-tab="intro" aria-selected="true">Introduction</button>
+      <button role="tab" class="tab" id="tab-charts" data-tab="charts" aria-selected="false">Charts</button>
+    </nav>
+
+    <div class="tools">
+      <button class="tool" id="btn-expr" aria-haspopup="dialog" aria-expanded="false" aria-controls="pop-expr">
+        <span class="fx">x(t)</span><span class="tool-label">Function</span>
+      </button>
+      <button class="tool" id="btn-options" aria-haspopup="dialog" aria-expanded="false" aria-controls="pop-options">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+        <span class="tool-label">Options</span>
+      </button>
+      <button class="tool icon-only" id="btn-theme" aria-label="Switch light or dark theme">
+        <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+      </button>
+      <button class="tool" id="btn-reset" aria-label="Reset everything">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+        <span class="tool-label">Reset</span>
+      </button>
+    </div>
+
+    <div class="popover" id="pop-options" role="dialog" aria-label="Options" hidden>
+      <h3 class="pop-title">Options</h3>
+      <label class="opt"><span><b>Walls</b><small>Stop the man at ±10 m</small></span>
+        <span class="switch"><input type="checkbox" id="opt-walls" checked><span class="switch-ui"></span></span></label>
+      <label class="opt"><span><b>Sound</b><small>Footsteps and wall crashes</small></span>
+        <span class="switch"><input type="checkbox" id="opt-sound" checked><span class="switch-ui"></span></span></label>
+      <label class="opt"><span><b>Flip x-axis</b><small>Positive points left</small></span>
+        <span class="switch"><input type="checkbox" id="opt-invert"><span class="switch-ui"></span></span></label>
+      <label class="opt"><span><b>Motion trail</b><small>Mark position every 0.5 s</small></span>
+        <span class="switch"><input type="checkbox" class="js-trail" id="opt-trail"><span class="switch-ui"></span></span></label>
+      <label class="opt"><span><b>Velocity vector</b><small>Arrow above the man</small></span>
+        <span class="switch"><input type="checkbox" class="js-vec" data-q="v" id="opt-vec-v"><span class="switch-ui"></span></span></label>
+      <label class="opt"><span><b>Acceleration vector</b><small>Arrow above the man</small></span>
+        <span class="switch"><input type="checkbox" class="js-vec" data-q="a" id="opt-vec-a"><span class="switch-ui"></span></span></label>
+      <p class="pop-note">Shortcuts: <kbd>Space</kbd> play/pause · <kbd>←</kbd><kbd>→</kbd> step · <kbd>Home</kbd> rewind</p>
+    </div>
+
+    <div class="popover wide" id="pop-expr" role="dialog" aria-label="Position function" hidden>
+      <h3 class="pop-title">Position function</h3>
+      <p class="pop-text">Type a formula and the man follows it while recording. Position is in meters, time <i>t</i> in seconds.</p>
+      <form class="expr-form" id="expr-form" autocomplete="off">
+        <label class="expr-field" for="expr-input"><span class="expr-lhs">x(t) =</span>
+          <input id="expr-input" type="text" spellcheck="false" value="6 sin(t)"></label>
+        <p class="expr-msg" id="expr-msg">Supports + − × ÷ ^, sin, cos, tan, sqrt, abs, exp, ln, pi.</p>
+        <div class="chips" id="expr-presets">
+          <button type="button" class="chip" data-expr="6 sin(t)">6 sin(t)</button>
+          <button type="button" class="chip" data-expr="-8 + 2t">−8 + 2t</button>
+          <button type="button" class="chip" data-expr="t^2/2 - 9">t²/2 − 9</button>
+          <button type="button" class="chip" data-expr="8 cos(0.5t)">8 cos(0.5t)</button>
+          <button type="button" class="chip" data-expr="9 - 3abs(t - 6)">9 − 3|t − 6|</button>
+          <button type="button" class="chip" data-expr="4 sin(2t) + 3 sin(0.7t)">4 sin 2t + 3 sin 0.7t</button>
+        </div>
+        <div class="pop-actions">
+          <button type="button" class="btn-ghost" id="expr-stop">Stop using</button>
+          <button type="submit" class="btn-primary" id="expr-apply">Use function</button>
+        </div>
+      </form>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="stage" id="stage" aria-label="Sidewalk scene">
+      <canvas id="scene" role="img" aria-label="A man on a sidewalk marked from −10 to 10 meters. Drag him to move."></canvas>
+      <div class="stage-hud">
+        <span class="hud-chip" id="hud-mode"><span class="rec-dot"></span><span id="hud-mode-text">Ready to record</span></span>
+        <span class="hud-chip expr-chip" id="hud-expr" hidden></span>
+      </div>
+      <p class="drag-hint" id="drag-hint">Drag the man, or move a slider, to start recording</p>
+      <button class="return-man" id="btn-return" hidden>Bring the man back</button>
+    </section>
+
+    <section class="panel-intro" id="panel-intro" role="tabpanel" aria-labelledby="tab-intro">
+      <article class="gauge" data-q="x" id="gauge-x">
+        <header class="gauge-head"><span class="q-dot"></span><h2 class="q-name">Position</h2><span class="drive-pill">Driving</span></header>
+        <div class="readout"><input class="q-value js-num" data-q="x" id="num-x" type="text" inputmode="decimal" aria-label="Position in meters" value="0.00"><span class="q-unit">m</span></div>
+        <div class="slider-wrap"><input type="range" class="js-slider" data-q="x" id="slider-x" min="-10" max="10" step="0.01" value="0" aria-label="Position slider">
+          <div class="slider-scale"><span>−10</span><span>0</span><span>10</span></div></div>
+        <footer class="gauge-foot"><label class="switch-row"><span class="switch"><input type="checkbox" class="js-trail" id="trail-x"><span class="switch-ui"></span></span>Motion trail</label></footer>
+      </article>
+
+      <article class="gauge" data-q="v" id="gauge-v">
+        <header class="gauge-head"><span class="q-dot"></span><h2 class="q-name">Velocity</h2><span class="drive-pill">Driving</span></header>
+        <div class="readout"><input class="q-value js-num" data-q="v" id="num-v" type="text" inputmode="decimal" aria-label="Velocity in meters per second" value="0.00"><span class="q-unit">m/s</span></div>
+        <div class="slider-wrap"><input type="range" class="js-slider" data-q="v" id="slider-v" min="-10" max="10" step="0.01" value="0" aria-label="Velocity slider">
+          <div class="slider-scale"><span>−10</span><span>0</span><span>10</span></div></div>
+        <footer class="gauge-foot"><label class="switch-row"><span class="switch"><input type="checkbox" class="js-vec" data-q="v" id="vec-v"><span class="switch-ui"></span></span>Show vector</label></footer>
+      </article>
+
+      <article class="gauge" data-q="a" id="gauge-a">
+        <header class="gauge-head"><span class="q-dot"></span><h2 class="q-name">Acceleration</h2><span class="drive-pill">Driving</span></header>
+        <div class="readout"><input class="q-value js-num" data-q="a" id="num-a" type="text" inputmode="decimal" aria-label="Acceleration in meters per second squared" value="0.00"><span class="q-unit">m/s²</span></div>
+        <div class="slider-wrap"><input type="range" class="js-slider" data-q="a" id="slider-a" min="-10" max="10" step="0.01" value="0" aria-label="Acceleration slider">
+          <div class="slider-scale"><span>−10</span><span>0</span><span>10</span></div></div>
+        <footer class="gauge-foot"><label class="switch-row"><span class="switch"><input type="checkbox" class="js-vec" data-q="a" id="vec-a"><span class="switch-ui"></span></span>Show vector</label></footer>
+      </article>
+    </section>
+
+    <section class="panel-charts" id="panel-charts" role="tabpanel" aria-labelledby="tab-charts" hidden>
+      <div class="chart-row" data-q="x" id="row-x">
+        <div class="chart-side">
+          <div class="side-top"><span class="q-dot"></span><h3 class="q-name">Position</h3><span class="drive-pill">Driving</span>
+            <button class="collapse" data-q="x" aria-expanded="true" aria-label="Collapse position chart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button></div>
+          <div class="readout sm"><input class="q-value js-num" data-q="x" id="cnum-x" type="text" inputmode="decimal" aria-label="Position in meters" value="0.00"><span class="q-unit">m</span></div>
+          <div class="side-controls"><label class="switch-row sm"><span class="switch"><input type="checkbox" class="js-trail" id="ctrail-x"><span class="switch-ui"></span></span>Trail</label>
+            <div class="zoom"><button class="zoom-btn" data-q="x" data-zoom="out" aria-label="Zoom out position axis">−</button><button class="zoom-btn" data-q="x" data-zoom="in" aria-label="Zoom in position axis">+</button></div></div>
+        </div>
+        <div class="chart-box"><canvas id="chart-x" aria-label="Position versus time graph"></canvas></div>
+      </div>
+
+      <div class="chart-row" data-q="v" id="row-v">
+        <div class="chart-side">
+          <div class="side-top"><span class="q-dot"></span><h3 class="q-name">Velocity</h3><span class="drive-pill">Driving</span>
+            <button class="collapse" data-q="v" aria-expanded="true" aria-label="Collapse velocity chart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button></div>
+          <div class="readout sm"><input class="q-value js-num" data-q="v" id="cnum-v" type="text" inputmode="decimal" aria-label="Velocity in meters per second" value="0.00"><span class="q-unit">m/s</span></div>
+          <div class="side-controls"><label class="switch-row sm"><span class="switch"><input type="checkbox" class="js-vec" data-q="v" id="cvec-v"><span class="switch-ui"></span></span>Vector</label>
+            <div class="zoom"><button class="zoom-btn" data-q="v" data-zoom="out" aria-label="Zoom out velocity axis">−</button><button class="zoom-btn" data-q="v" data-zoom="in" aria-label="Zoom in velocity axis">+</button></div></div>
+        </div>
+        <div class="chart-box"><canvas id="chart-v" aria-label="Velocity versus time graph"></canvas></div>
+      </div>
+
+      <div class="chart-row" data-q="a" id="row-a">
+        <div class="chart-side">
+          <div class="side-top"><span class="q-dot"></span><h3 class="q-name">Acceleration</h3><span class="drive-pill">Driving</span>
+            <button class="collapse" data-q="a" aria-expanded="true" aria-label="Collapse acceleration chart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button></div>
+          <div class="readout sm"><input class="q-value js-num" data-q="a" id="cnum-a" type="text" inputmode="decimal" aria-label="Acceleration in meters per second squared" value="0.00"><span class="q-unit">m/s²</span></div>
+          <div class="side-controls"><label class="switch-row sm"><span class="switch"><input type="checkbox" class="js-vec" data-q="a" id="cvec-a"><span class="switch-ui"></span></span>Vector</label>
+            <div class="zoom"><button class="zoom-btn" data-q="a" data-zoom="out" aria-label="Zoom out acceleration axis">−</button><button class="zoom-btn" data-q="a" data-zoom="in" aria-label="Zoom in acceleration axis">+</button></div></div>
+        </div>
+        <div class="chart-box"><canvas id="chart-a" aria-label="Acceleration versus time graph"></canvas></div>
+      </div>
+      <p class="chart-help">Drag the round handle on a graph's axis to set that value. Click or drag inside a graph to scrub through the recording.</p>
+    </section>
+
+    <p class="credit">A re-imagining of PhET's <i>The Moving Man</i> from the University of Colorado Boulder. All units SI.</p>
+  </main>
+
+  <footer class="transport" id="transport">
+    <div class="seg mode-seg" role="radiogroup" aria-label="Mode">
+      <button role="radio" class="seg-btn" id="mode-record" aria-checked="true"><span class="rec-dot"></span>Record</button>
+      <button role="radio" class="seg-btn" id="mode-playback" aria-checked="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" class="fill"/></svg>Playback</button>
+    </div>
+
+    <div class="deck">
+      <button class="t-btn" id="btn-rewind" aria-label="Rewind to start"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5v14"/><path d="M19 5L9 12l10 7z" class="fill"/></svg></button>
+      <button class="t-btn" id="btn-stepback" aria-label="Step back"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 6l-7 6 7 6"/></svg></button>
+      <button class="t-btn play" id="btn-play" aria-label="Play">
+        <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" class="fill"/></svg>
+        <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="5" width="4" height="14" rx="1" class="fill"/><rect x="13.5" y="5" width="4" height="14" rx="1" class="fill"/></svg>
+      </button>
+      <button class="t-btn" id="btn-step" aria-label="Step forward"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 6l7 6-7 6"/></svg></button>
+    </div>
+
+    <div class="timeline">
+      <div class="time-read"><span class="t-lbl">t</span><span id="time-now">0.00</span><span class="time-max">/ 20.00 s</span></div>
+      <input type="range" id="scrub" class="scrub" min="0" max="20" step="0.01" value="0" aria-label="Recording time">
+    </div>
+
+    <div class="speed">
+      <span class="lbl">Speed</span>
+      <div class="seg small" id="speed-seg" role="group" aria-label="Playback speed">
+        <button class="seg-btn" data-speed="0.25">¼×</button>
+        <button class="seg-btn" data-speed="0.5">½×</button>
+        <button class="seg-btn" data-speed="1" aria-pressed="true">1×</button>
+        <button class="seg-btn" data-speed="2">2×</button>
+      </div>
+    </div>
+
+    <button class="btn-ghost danger" id="btn-clear">Clear</button>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toast-text"></span><button class="toast-action" id="toast-action" hidden></button></div>
+</div>
+
+<script src="js/expr.js"></script>
+<script src="js/model.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/man.js"></script>
+<script src="js/scene.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
